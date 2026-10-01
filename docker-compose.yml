@@ -1,0 +1,16 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      FRONTEND_URL: http://localhost:8080
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: http://127.0.0.1:8000/api/v1
+    ports:
+      - "8080:80"
