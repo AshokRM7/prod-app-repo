@@ -1,0 +1,46 @@
+name: Deploy to AWS
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials using OIDC
+        uses: aws-actions/configure-aws-credentials@v6.3.0
+        with:
+          role-to-assume: arn:aws:iam::699061129530:role/production-app-github-actions-deploy-role
+          aws-region: ap-south-1
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build backend image
+        run: |
+          docker build \
+            -t 699061129530.dkr.ecr.ap-south-1.amazonaws.com/production-app-backend:${{ github.sha }} \
+            ./backend
+
+      - name: Push backend image
+        run: |
+          docker push 699061129530.dkr.ecr.ap-south-1.amazonaws.com/production-app-backend:${{ github.sha }}
+
+      - name: Build frontend image
+        run: |
+          docker build \
+            --build-arg VITE_API_BASE_URL=/api/v1 \
+            -t 699061129530.dkr.ecr.ap-south-1.amazonaws.com/production-app-frontend:${{ github.sha }} \
+            ./frontend
+
+      - name: Push frontend image
+        run: |
+          docker push 699061129530.dkr.ecr.ap-south-1.amazonaws.com/production-app-frontend:${{ github.sha }}
