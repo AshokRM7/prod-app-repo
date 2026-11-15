@@ -34,6 +34,29 @@ jobs:
         run: |
           docker push 699061129530.dkr.ecr.ap-south-1.amazonaws.com/production-app-backend:${{ github.sha }}
 
+      - name: Download current backend task definition
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition production-app-backend \
+            --query taskDefinition \
+            > backend-task-definition.json
+
+      - name: Render backend task definition
+        id: backend-task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: backend-task-definition.json
+          container-name: backend
+          image: 699061129530.dkr.ecr.ap-south-1.amazonaws.com/production-app-backend:${{ github.sha }}
+
+      - name: Deploy backend to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.backend-task-def.outputs.task-definition }}
+          service: production-app-backend-service
+          cluster: production-app-cluster
+          wait-for-service-stability: true
+
       - name: Build frontend image
         run: |
           docker build \
