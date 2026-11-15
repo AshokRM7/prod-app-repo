@@ -220,11 +220,6 @@ resource "aws_ecs_task_definition" "backend" {
         protocol      = "tcp"
       }]
 
-      environment = [{
-        name  = "FRONTEND_URL"
-        value = "http://localhost:8080"
-      }]
-
       logConfiguration = {
         logDriver = "awslogs"
         options = {
@@ -273,7 +268,7 @@ resource "aws_ecs_service" "backend" {
   task_definition = aws_ecs_task_definition.backend.arn
   desired_count   = 1
   launch_type     = "FARGATE"
-
+  
   network_configuration {
     subnets          = data.aws_subnets.default.ids
     security_groups  = [aws_security_group.backend.id]
@@ -290,6 +285,12 @@ resource "aws_ecs_service" "backend" {
     aws_lb_listener.http,
     aws_lb_listener_rule.backend_api
   ]
+
+  lifecycle {
+  ignore_changes = [
+    task_definition
+  ]
+}
 }
 resource "aws_ecs_service" "frontend" {
   name            = "production-app-frontend-service"
@@ -313,6 +314,12 @@ resource "aws_ecs_service" "frontend" {
   depends_on = [
     aws_lb_listener.http
   ]
+
+  lifecycle {
+  ignore_changes = [
+    task_definition
+  ]
+}
 }
 resource "aws_iam_openid_connect_provider" "github" {
   url = "https://token.actions.githubusercontent.com"
