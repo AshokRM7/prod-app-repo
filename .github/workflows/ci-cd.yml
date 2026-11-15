@@ -75,3 +75,70 @@ jobs:
 
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build backend image
+        run: |
+          docker build \
+            -t 699061129530.dkr.ecr.ap-south-1.amazonaws.com/production-app-backend:${{ github.sha }} \
+            ./backend
+
+      - name: Push backend image
+        run: |
+          docker push 699061129530.dkr.ecr.ap-south-1.amazonaws.com/production-app-backend:${{ github.sha }}
+
+      - name: Download current backend task definition
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition production-app-backend \
+            --query taskDefinition \
+            > backend-task-definition.json
+
+      - name: Render backend task definition
+        id: backend-task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: backend-task-definition.json
+          container-name: backend
+          image: 699061129530.dkr.ecr.ap-south-1.amazonaws.com/production-app-backend:${{ github.sha }}
+
+      - name: Deploy backend to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.backend-task-def.outputs.task-definition }}
+          service: production-app-backend-service
+          cluster: production-app-cluster
+          wait-for-service-stability: true
+
+      - name: Build frontend image
+        run: |
+          docker build \
+            --build-arg VITE_API_BASE_URL=/api/v1 \
+            -t 699061129530.dkr.ecr.ap-south-1.amazonaws.com/production-app-frontend:${{ github.sha }} \
+            ./frontend
+
+      - name: Push frontend image
+        run: |
+          docker push 699061129530.dkr.ecr.ap-south-1.amazonaws.com/production-app-frontend:${{ github.sha }}
+          
+      - name: Download current frontend task definition
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition production-app-frontend \
+            --query taskDefinition \
+            > frontend-task-definition.json
+
+      - name: Render frontend task definition
+        id: frontend-task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: frontend-task-definition.json
+          container-name: frontend
+          image: 699061129530.dkr.ecr.ap-south-1.amazonaws.com/production-app-frontend:${{ github.sha }}
+
+      - name: Deploy frontend to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.frontend-task-def.outputs.task-definition }}
+          service: production-app-frontend-service
+          cluster: production-app-cluster
+          wait-for-service-stability: true
