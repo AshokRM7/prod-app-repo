@@ -109,6 +109,12 @@ jobs:
           cluster: production-app-cluster
           wait-for-service-stability: true
 
+      - name: Verify backend health
+        run: |
+          curl --fail --retry 5 --retry-delay 10 \
+            http://production-app-alb-1917539745.ap-south-1.elb.amazonaws.com/api/v1/health
+
+
       - name: Build frontend image
         run: |
           docker build \
@@ -119,7 +125,7 @@ jobs:
       - name: Push frontend image
         run: |
           docker push 699061129530.dkr.ecr.ap-south-1.amazonaws.com/production-app-frontend:${{ github.sha }}
-          
+
       - name: Download current frontend task definition
         run: |
           aws ecs describe-task-definition \
@@ -142,3 +148,8 @@ jobs:
           service: production-app-frontend-service
           cluster: production-app-cluster
           wait-for-service-stability: true
+
+      - name: Verify frontend
+        run: |
+          curl --fail --retry 5 --retry-delay 10 \
+            http://production-app-alb-1917539745.ap-south-1.elb.amazonaws.com/
