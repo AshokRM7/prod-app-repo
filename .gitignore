@@ -17,3 +17,16 @@ __pycache__/
 # Operating system files
 .DS_Store
 Thumbs.db
+
+#samplefile
+
+samplefiles/
+
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+crash.log
+crash.*.log
+tfplan
+*.tfplan
