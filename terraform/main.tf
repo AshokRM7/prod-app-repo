@@ -286,6 +286,11 @@ resource "aws_ecs_service" "backend" {
     aws_lb_listener_rule.backend_api
   ]
 
+  deployment_circuit_breaker {
+  enable   = true
+  rollback = true
+}
+
   lifecycle {
   ignore_changes = [
     task_definition
@@ -314,6 +319,11 @@ resource "aws_ecs_service" "frontend" {
   depends_on = [
     aws_lb_listener.http
   ]
+
+  deployment_circuit_breaker {
+  enable   = true
+  rollback = true
+}
 
   lifecycle {
   ignore_changes = [
