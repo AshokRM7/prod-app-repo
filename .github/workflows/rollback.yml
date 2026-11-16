@@ -38,3 +38,8 @@ jobs:
           aws ecs wait services-stable \
             --cluster production-app-cluster \
             --services production-app-backend-service
+
+      - name: Verify backend health
+        run: |
+          curl --fail --retry 5 --retry-delay 10 \
+            http://production-app-alb-1917539745.ap-south-1.elb.amazonaws.com/api/v1/health
