@@ -10,6 +10,9 @@ permissions:
   id-token: write
   contents: read
 
+environment:
+  name: production
+
 jobs:
   backend-tests:
     runs-on: ubuntu-latest
