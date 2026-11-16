@@ -2,6 +2,8 @@ version: 0.2
 
 phases:
   install:
+    runtime-versions:
+      python: 3.12
     commands:
       - python --version
       - node --version
@@ -13,5 +15,5 @@ phases:
 
   build:
     commands:
-      - python -m pytest backend/tests -v
+      - cd backend && python -m pytest -v && cd ..
       - cd frontend && VITE_API_BASE_URL=/api/v1 npm run build && cd ..
