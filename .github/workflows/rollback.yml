@@ -1,0 +1,12 @@
+name: Rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+      backend_revision:
+        description: "Backend task definition revision to deploy"
+        required: true
+
+permissions:
+  id-token: write
+  contents: read
