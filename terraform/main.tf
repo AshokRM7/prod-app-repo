@@ -359,7 +359,7 @@ resource "aws_iam_role" "github_actions_deploy" {
       Condition = {
         StringEquals = {
           "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
-          "token.actions.githubusercontent.com:sub" = "repo:AshokRM7@71008384/prod-app-repo@1396015516:ref:refs/heads/main"
+          "token.actions.githubusercontent.com:sub" = "repo:AshokRM7@71008384/prod-app-repo@1396015516:environment:production"
         }
       }
     }]
