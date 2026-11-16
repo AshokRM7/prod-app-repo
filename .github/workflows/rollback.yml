@@ -6,7 +6,16 @@ on:
       backend_revision:
         description: "Backend task definition revision to deploy"
         required: true
+        type: string
 
 permissions:
   id-token: write
   contents: read
+
+jobs:
+  validate-input:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Show requested revision
+        run: echo "Rollback requested for backend revision ${{ inputs.backend_revision }}"
