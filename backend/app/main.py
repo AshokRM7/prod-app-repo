@@ -14,5 +14,6 @@ if settings.frontend_url:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    
 
 app.include_router(router, prefix="/api/v1")
