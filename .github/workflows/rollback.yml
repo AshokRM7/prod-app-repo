@@ -13,9 +13,28 @@ permissions:
   contents: read
 
 jobs:
-  validate-input:
+  rollback:
     runs-on: ubuntu-latest
 
+    environment:
+      name: production
+
     steps:
-      - name: Show requested revision
-        run: echo "Rollback requested for backend revision ${{ inputs.backend_revision }}"
+      - name: Configure AWS credentials using OIDC
+        uses: aws-actions/configure-aws-credentials@v6.3.0
+        with:
+          role-to-assume: arn:aws:iam::699061129530:role/production-app-github-actions-deploy-role
+          aws-region: ap-south-1
+
+      - name: Roll back backend service
+        run: |
+          aws ecs update-service \
+            --cluster production-app-cluster \
+            --service production-app-backend-service \
+            --task-definition production-app-backend:${{ inputs.backend_revision }}
+
+      - name: Wait for service stability
+        run: |
+          aws ecs wait services-stable \
+            --cluster production-app-cluster \
+            --services production-app-backend-service
