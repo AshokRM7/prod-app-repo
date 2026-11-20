@@ -4,16 +4,25 @@ phases:
   install:
     runtime-versions:
       python: 3.12
-    commands:
-      - python --version
-      - node --version
 
   pre_build:
     commands:
       - pip install -r backend/requirements.txt
       - cd frontend && npm ci && cd ..
 
+      - aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 699061129530.dkr.ecr.ap-south-1.amazonaws.com
+
+      - IMAGE_TAG=$CODEBUILD_RESOLVED_SOURCE_VERSION
+
   build:
     commands:
       - cd backend && python -m pytest -v && cd ..
       - cd frontend && VITE_API_BASE_URL=/api/v1 npm run build && cd ..
+
+      - docker build -t production-app-backend:$IMAGE_TAG ./backend
+      - docker tag production-app-backend:$IMAGE_TAG 699061129530.dkr.ecr.ap-south-1.amazonaws.com/production-app-backend:$IMAGE_TAG
+      - docker push 699061129530.dkr.ecr.ap-south-1.amazonaws.com/production-app-backend:$IMAGE_TAG
+
+      - docker build --build-arg VITE_API_BASE_URL=/api/v1 -t production-app-frontend:$IMAGE_TAG ./frontend
+      - docker tag production-app-frontend:$IMAGE_TAG 699061129530.dkr.ecr.ap-south-1.amazonaws.com/production-app-frontend:$IMAGE_TAG
+      - docker push 699061129530.dkr.ecr.ap-south-1.amazonaws.com/production-app-frontend:$IMAGE_TAG
