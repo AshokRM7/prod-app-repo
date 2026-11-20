@@ -26,3 +26,14 @@ phases:
       - docker build --build-arg VITE_API_BASE_URL=/api/v1 -t production-app-frontend:$IMAGE_TAG ./frontend
       - docker tag production-app-frontend:$IMAGE_TAG 699061129530.dkr.ecr.ap-south-1.amazonaws.com/production-app-frontend:$IMAGE_TAG
       - docker push 699061129530.dkr.ecr.ap-south-1.amazonaws.com/production-app-frontend:$IMAGE_TAG
+
+
+  post_build:
+    commands:
+      - printf '[{"name":"backend","imageUri":"699061129530.dkr.ecr.ap-south-1.amazonaws.com/production-app-backend:%s"}]' "$IMAGE_TAG" > imagedefinitions-backend.json
+      - printf '[{"name":"frontend","imageUri":"699061129530.dkr.ecr.ap-south-1.amazonaws.com/production-app-frontend:%s"}]' "$IMAGE_TAG" > imagedefinitions-frontend.json
+
+artifacts:
+  files:
+    - imagedefinitions-backend.json
+    - imagedefinitions-frontend.json
