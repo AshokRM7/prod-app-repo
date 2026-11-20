@@ -11,7 +11,7 @@ function App() {
 
   return (
     <div>
-      <h1>Production Apps</h1>
+      <h1>Production Grade App</h1>
       <p>{message}</p>
     </div>
   )
