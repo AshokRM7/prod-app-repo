@@ -17,5 +17,5 @@ def test_root_endpoint():
 
     assert response.status_code == 200
     assert response.json() == {
-        "message": "Hello from FastAPI"
+        "message": "Hello from Deployed Application"
     }
