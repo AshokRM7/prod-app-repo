@@ -83,8 +83,8 @@ resource "aws_iam_policy" "codepipeline_codeconnections" {
           "codestar-connections:UseConnection"
         ]
         Resource = [
-          "arn:aws:codestar-connections:*:699061129530:connection/<ACTUAL_CONNECTION_ID>",
-          "arn:aws:codeconnections:*:699061129530:connection/<ACTUAL_CONNECTION_ID>"
+          "arn:aws:codestar-connections:*:699061129530:connection/a83c37fd-817b-4cde-a0d0-ce4f2c388590",
+          "arn:aws:codeconnections:*:699061129530:connection/a83c37fd-817b-4cde-a0d0-ce4f2c388590"
         ]
       }
     ]
